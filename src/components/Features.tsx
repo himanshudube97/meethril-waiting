@@ -94,7 +94,7 @@ export default function Features() {
         transition={{ duration: 13, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
       />
 
-      <div className="relative z-10 max-w-6xl mx-auto">
+      <div className="relative z-10 max-w-5xl mx-auto">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -123,14 +123,9 @@ export default function Features() {
           and somewhere quiet for the parts of you that haven’t found their words yet
         </motion.p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+        <div className="flex flex-col gap-8 md:gap-12">
           {features.map((feature, i) => (
-            <FeatureCard
-              key={feature.title}
-              feature={feature}
-              index={i}
-              fullWidth={i === features.length - 1}
-            />
+            <FeatureCard key={feature.title} feature={feature} index={i} />
           ))}
         </div>
       </div>
@@ -222,29 +217,22 @@ function ShootingStars() {
   )
 }
 
-function FeatureCard({
-  feature,
-  index,
-  fullWidth,
-}: {
-  feature: Feature
-  index: number
-  fullWidth: boolean
-}) {
+function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
+  // Even-indexed cards slide in from the left, odd from the right.
+  const slideFromLeft = index % 2 === 0
+  const slideX = slideFromLeft ? -120 : 120
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40, scale: 0.94 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: '-60px' }}
+      initial={{ opacity: 0, x: slideX }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, margin: '-80px' }}
       transition={{
-        duration: 0.85,
-        delay: (index % 2) * 0.12,
+        duration: 0.95,
         ease: [0.22, 1, 0.36, 1],
       }}
-      whileHover={{ y: -6, transition: { duration: 0.25 } }}
-      className={`relative overflow-hidden rounded-3xl p-6 md:p-8 ${
-        fullWidth ? 'md:col-span-2' : ''
-      }`}
+      whileHover={{ y: -4, transition: { duration: 0.25 } }}
+      className="relative overflow-hidden rounded-2xl"
       style={{
         background: `linear-gradient(155deg, #FFF1DC 0%, #FFE2BC 55%, #FFD2A8 100%)`,
         border: `1px solid rgba(255, 200, 144, 0.6)`,
@@ -256,7 +244,7 @@ function FeatureCard({
         `,
       }}
     >
-      {/* Inner top-light: card glows from above like a lamp on a desk */}
+      {/* Inner top-light */}
       <div
         aria-hidden
         className="absolute pointer-events-none"
@@ -271,17 +259,17 @@ function FeatureCard({
         }}
       />
 
-      {/* Accent corner glow that drifts subtly */}
+      {/* Accent glow on the side the card slides in from */}
       <motion.div
         aria-hidden
         className="absolute pointer-events-none rounded-full"
         style={{
-          width: 220,
-          height: 220,
+          width: 260,
+          height: 260,
           background: `radial-gradient(circle, ${feature.accentTint}66 0%, transparent 65%)`,
-          filter: 'blur(40px)',
-          top: -70,
-          right: -70,
+          filter: 'blur(50px)',
+          top: -80,
+          ...(slideFromLeft ? { right: -90 } : { left: -90 }),
         }}
         animate={{ opacity: [0.55, 0.85, 0.55], scale: [1, 1.06, 1] }}
         transition={{
@@ -293,23 +281,20 @@ function FeatureCard({
       />
 
       <div
-        className={`relative z-10 ${
-          fullWidth
-            ? 'flex flex-col md:flex-row md:items-center gap-6 md:gap-10'
-            : 'flex flex-col gap-6'
-        }`}
+        className={`relative z-10 flex flex-col ${
+          slideFromLeft ? 'md:flex-row' : 'md:flex-row-reverse'
+        } md:items-stretch min-h-[260px] md:min-h-[240px]`}
       >
+        {/* Preview area */}
         <div
-          className={`relative rounded-2xl overflow-hidden flex items-center justify-center shrink-0 ${
-            fullWidth ? 'w-full md:w-2/5 h-44 md:h-52' : 'w-full h-44 md:h-52'
-          }`}
+          className="relative shrink-0 w-full md:w-[44%] h-48 md:h-auto overflow-hidden flex items-center justify-center"
           style={{
             background: `linear-gradient(180deg, #3A1F26 0%, #5A2C36 100%)`,
-            border: `1px solid rgba(58, 31, 38, 0.4)`,
+            borderBottom: `1px solid rgba(58, 31, 38, 0.4)`,
             boxShadow: `inset 0 2px 16px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 200, 144, 0.08)`,
           }}
         >
-          {/* tiny inner stars in the preview window */}
+          {/* tiny stars inside the preview window */}
           {[...Array(6)].map((_, i) => (
             <motion.div
               key={i}
@@ -333,7 +318,9 @@ function FeatureCard({
           ))}
           {feature.preview}
         </div>
-        <div className="flex-1">
+
+        {/* Text area */}
+        <div className="flex-1 flex flex-col justify-center p-6 md:p-10">
           <h3
             className="text-2xl md:text-3xl mb-3"
             style={{
