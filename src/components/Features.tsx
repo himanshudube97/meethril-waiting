@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, ReactNode } from 'react'
+import { useEffect, useState, ReactNode, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { theme, fontSerif, fontBody } from '@/lib/theme'
 
@@ -54,41 +54,44 @@ export default function Features() {
     <section
       className="relative py-24 md:py-32 px-6 overflow-hidden"
       style={{
-        background: `linear-gradient(180deg, #B85E5C 0%, #8E3A44 50%, #5A2C36 100%)`,
+        background: `linear-gradient(180deg, #2A0F18 0%, #4A1A24 25%, #7A2C36 60%, #5A2530 100%)`,
       }}
     >
-      {/* Soft glow accents in the section background */}
+      <Starfield />
+      <ShootingStars />
+
+      {/* Big atmospheric glows */}
       <motion.div
         aria-hidden
         className="absolute pointer-events-none rounded-full"
         style={{
           width: '60vw',
           height: '60vw',
-          maxWidth: 700,
-          maxHeight: 700,
-          background: `radial-gradient(circle, ${theme.accent.warm}22 0%, transparent 65%)`,
-          filter: 'blur(70px)',
-          top: '20%',
-          left: '-15%',
+          maxWidth: 800,
+          maxHeight: 800,
+          background: `radial-gradient(circle, ${theme.accent.warm}28 0%, transparent 65%)`,
+          filter: 'blur(80px)',
+          top: '15%',
+          left: '-20%',
         }}
-        animate={{ opacity: [0.5, 0.8, 0.5] }}
+        animate={{ opacity: [0.4, 0.85, 0.4], scale: [1, 1.08, 1] }}
         transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
       />
       <motion.div
         aria-hidden
         className="absolute pointer-events-none rounded-full"
         style={{
-          width: '50vw',
-          height: '50vw',
-          maxWidth: 600,
-          maxHeight: 600,
-          background: `radial-gradient(circle, ${theme.accent.highlight}1a 0%, transparent 65%)`,
-          filter: 'blur(70px)',
-          bottom: '10%',
-          right: '-10%',
+          width: '55vw',
+          height: '55vw',
+          maxWidth: 700,
+          maxHeight: 700,
+          background: `radial-gradient(circle, ${theme.accent.highlight}22 0%, transparent 65%)`,
+          filter: 'blur(90px)',
+          bottom: '5%',
+          right: '-15%',
         }}
-        animate={{ opacity: [0.4, 0.7, 0.4] }}
-        transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+        animate={{ opacity: [0.3, 0.7, 0.3], scale: [1, 1.1, 1] }}
+        transition={{ duration: 13, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
       />
 
       <div className="relative z-10 max-w-6xl mx-auto">
@@ -96,13 +99,14 @@ export default function Features() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.9 }}
           className="text-3xl md:text-5xl text-center mb-4"
           style={{
             color: theme.bg.primary,
             fontFamily: fontSerif,
             letterSpacing: '0.05em',
             fontWeight: 500,
+            textShadow: `0 0 30px ${theme.accent.warm}55`,
           }}
         >
           a place for everything
@@ -110,11 +114,11 @@ export default function Features() {
 
         <motion.p
           initial={{ opacity: 0 }}
-          whileInView={{ opacity: 0.75 }}
+          whileInView={{ opacity: 0.85 }}
           viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.8, delay: 0.15 }}
-          className="text-center text-base md:text-lg italic mb-16 md:mb-20"
-          style={{ color: theme.bg.primary, fontFamily: fontBody }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="text-center text-base md:text-lg italic mb-16 md:mb-24"
+          style={{ color: theme.accent.highlight, fontFamily: fontBody }}
         >
           and somewhere quiet for the parts of you that haven’t found their words yet
         </motion.p>
@@ -134,6 +138,90 @@ export default function Features() {
   )
 }
 
+function Starfield() {
+  // Generate stars once on mount; deterministic per render via index-based math
+  const stars = useMemo(() => {
+    return Array.from({ length: 80 }).map((_, i) => ({
+      id: i,
+      left: (i * 13.7) % 100,
+      top: (i * 19.3) % 100,
+      size: 1 + ((i * 3) % 4) * 0.6,
+      duration: 2 + (i % 5),
+      delay: (i * 0.27) % 6,
+      bright: i % 7 === 0,
+    }))
+  }, [])
+
+  return (
+    <div aria-hidden className="absolute inset-0 pointer-events-none">
+      {stars.map((s) => (
+        <motion.div
+          key={s.id}
+          className="absolute rounded-full"
+          style={{
+            left: `${s.left}%`,
+            top: `${s.top}%`,
+            width: s.size,
+            height: s.size,
+            background: s.bright ? theme.accent.highlight : theme.bg.primary,
+            boxShadow: s.bright
+              ? `0 0 ${4 + s.size * 2}px ${theme.accent.warm}, 0 0 ${8 + s.size * 3}px ${theme.accent.warm}55`
+              : `0 0 3px ${theme.bg.primary}`,
+          }}
+          animate={{
+            opacity: [0.15, s.bright ? 1 : 0.7, 0.15],
+            scale: s.bright ? [0.9, 1.4, 0.9] : [1, 1.15, 1],
+          }}
+          transition={{
+            duration: s.duration,
+            repeat: Infinity,
+            delay: s.delay,
+            ease: 'easeInOut',
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+function ShootingStars() {
+  return (
+    <div aria-hidden className="absolute inset-0 pointer-events-none overflow-hidden">
+      {[
+        { top: '15%', delay: 4, duration: 2.4 },
+        { top: '55%', delay: 11, duration: 2.8 },
+      ].map((cfg, i) => (
+        <motion.div
+          key={i}
+          className="absolute"
+          style={{
+            top: cfg.top,
+            left: '-10%',
+            width: 100,
+            height: 1.5,
+            background: `linear-gradient(90deg, transparent 0%, ${theme.accent.highlight} 60%, ${theme.bg.primary} 100%)`,
+            borderRadius: 1,
+            boxShadow: `0 0 6px ${theme.accent.highlight}, 0 0 12px ${theme.accent.warm}`,
+            filter: 'blur(0.4px)',
+          }}
+          animate={{
+            x: ['0vw', '120vw'],
+            y: [0, 80],
+            opacity: [0, 1, 0],
+          }}
+          transition={{
+            duration: cfg.duration,
+            delay: cfg.delay,
+            repeat: Infinity,
+            repeatDelay: 16 + i * 6,
+            ease: 'easeOut',
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
 function FeatureCard({
   feature,
   index,
@@ -145,32 +233,62 @@ function FeatureCard({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 40, scale: 0.94 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.7, delay: (index % 2) * 0.1, ease: 'easeOut' }}
-      whileHover={{ y: -4 }}
+      transition={{
+        duration: 0.85,
+        delay: (index % 2) * 0.12,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      whileHover={{ y: -6, transition: { duration: 0.25 } }}
       className={`relative overflow-hidden rounded-3xl p-6 md:p-8 ${
         fullWidth ? 'md:col-span-2' : ''
       }`}
       style={{
-        background: `linear-gradient(150deg, rgba(255, 222, 198, 0.18) 0%, rgba(232, 148, 90, 0.12) 50%, rgba(184, 94, 92, 0.18) 100%)`,
-        backdropFilter: 'blur(16px)',
-        border: `1px solid rgba(255, 222, 198, 0.25)`,
-        boxShadow: `0 12px 40px rgba(58, 31, 38, 0.35), inset 0 1px 0 rgba(255, 222, 198, 0.15)`,
+        background: `linear-gradient(155deg, #FFF1DC 0%, #FFE2BC 55%, #FFD2A8 100%)`,
+        border: `1px solid rgba(255, 200, 144, 0.6)`,
+        boxShadow: `
+          0 24px 60px rgba(0, 0, 0, 0.5),
+          0 8px 24px rgba(200, 71, 45, 0.25),
+          inset 0 1px 0 rgba(255, 255, 255, 0.85),
+          inset 0 -1px 0 rgba(200, 71, 45, 0.15)
+        `,
       }}
     >
-      {/* Accent corner glow */}
+      {/* Inner top-light: card glows from above like a lamp on a desk */}
       <div
+        aria-hidden
+        className="absolute pointer-events-none"
+        style={{
+          top: 0,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '90%',
+          height: 90,
+          background: `radial-gradient(ellipse at top, ${theme.accent.highlight}88 0%, transparent 70%)`,
+          opacity: 0.6,
+        }}
+      />
+
+      {/* Accent corner glow that drifts subtly */}
+      <motion.div
         aria-hidden
         className="absolute pointer-events-none rounded-full"
         style={{
-          width: 200,
-          height: 200,
-          background: `radial-gradient(circle, ${feature.accentTint}55 0%, transparent 65%)`,
+          width: 220,
+          height: 220,
+          background: `radial-gradient(circle, ${feature.accentTint}66 0%, transparent 65%)`,
           filter: 'blur(40px)',
-          top: -60,
-          right: -60,
+          top: -70,
+          right: -70,
+        }}
+        animate={{ opacity: [0.55, 0.85, 0.55], scale: [1, 1.06, 1] }}
+        transition={{
+          duration: 6 + index * 0.5,
+          repeat: Infinity,
+          ease: 'easeInOut',
+          delay: index * 0.4,
         }}
       />
 
@@ -182,26 +300,47 @@ function FeatureCard({
         }`}
       >
         <div
-          className={`rounded-2xl overflow-hidden flex items-center justify-center shrink-0 ${
+          className={`relative rounded-2xl overflow-hidden flex items-center justify-center shrink-0 ${
             fullWidth ? 'w-full md:w-2/5 h-44 md:h-52' : 'w-full h-44 md:h-52'
           }`}
           style={{
-            background: `linear-gradient(180deg, rgba(58, 31, 38, 0.55) 0%, rgba(58, 31, 38, 0.35) 100%)`,
-            border: `1px solid rgba(255, 222, 198, 0.12)`,
-            boxShadow: `inset 0 1px 12px rgba(0, 0, 0, 0.25)`,
+            background: `linear-gradient(180deg, #3A1F26 0%, #5A2C36 100%)`,
+            border: `1px solid rgba(58, 31, 38, 0.4)`,
+            boxShadow: `inset 0 2px 16px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 200, 144, 0.08)`,
           }}
         >
+          {/* tiny inner stars in the preview window */}
+          {[...Array(6)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute rounded-full pointer-events-none"
+              style={{
+                width: 1.5,
+                height: 1.5,
+                background: theme.accent.highlight,
+                left: `${10 + i * 16}%`,
+                top: `${15 + (i * 17) % 70}%`,
+                boxShadow: `0 0 4px ${theme.accent.warm}`,
+              }}
+              animate={{ opacity: [0.2, 0.9, 0.2] }}
+              transition={{
+                duration: 2.5 + i * 0.4,
+                repeat: Infinity,
+                delay: i * 0.4,
+                ease: 'easeInOut',
+              }}
+            />
+          ))}
           {feature.preview}
         </div>
         <div className="flex-1">
           <h3
             className="text-2xl md:text-3xl mb-3"
             style={{
-              color: theme.accent.highlight,
+              color: '#3A1F26',
               fontFamily: fontSerif,
               fontWeight: 500,
               letterSpacing: '0.01em',
-              textShadow: `0 0 20px ${feature.accentTint}55`,
             }}
           >
             {feature.title}
@@ -209,9 +348,8 @@ function FeatureCard({
           <p
             className="text-base md:text-lg leading-relaxed"
             style={{
-              color: theme.bg.primary,
+              color: '#6E4248',
               fontFamily: fontBody,
-              opacity: 0.92,
             }}
           >
             {feature.description}
@@ -226,15 +364,14 @@ function FeatureCard({
 
 function JournalPreview() {
   return (
-    <svg viewBox="0 0 220 140" className="w-4/5 h-4/5">
+    <svg viewBox="0 0 220 140" className="w-4/5 h-4/5 relative z-10">
       <defs>
         <linearGradient id="paperGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="rgba(255, 245, 225, 0.92)" />
-          <stop offset="100%" stopColor="rgba(255, 232, 200, 0.85)" />
+          <stop offset="0%" stopColor="rgba(255, 245, 225, 0.95)" />
+          <stop offset="100%" stopColor="rgba(255, 232, 200, 0.88)" />
         </linearGradient>
       </defs>
       <rect x="14" y="10" width="192" height="120" fill="url(#paperGrad)" rx="3" />
-      {/* spine shadow */}
       <line
         x1="110"
         y1="10"
@@ -287,15 +424,14 @@ function JournalPreview() {
 function LetterPreview() {
   const labels = ['self', 'friend', 'stranger']
   return (
-    <div className="flex justify-around items-center w-full h-full px-4 relative">
-      {/* Soft floor glow */}
+    <div className="flex justify-around items-center w-full h-full px-4 relative z-10">
       <div
         aria-hidden
         className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full"
         style={{
           width: '70%',
           height: 12,
-          background: `radial-gradient(ellipse at center, ${theme.accent.warm}40, transparent 70%)`,
+          background: `radial-gradient(ellipse at center, ${theme.accent.warm}55, transparent 70%)`,
           filter: 'blur(6px)',
         }}
       />
@@ -315,7 +451,7 @@ function LetterPreview() {
             width="56"
             height="40"
             viewBox="0 0 56 40"
-            style={{ filter: `drop-shadow(0 4px 8px ${theme.accent.primary}55)` }}
+            style={{ filter: `drop-shadow(0 4px 10px ${theme.accent.primary}88)` }}
           >
             <rect
               x="2"
@@ -333,14 +469,13 @@ function LetterPreview() {
               strokeWidth="1.2"
               fill="none"
             />
-            {/* tiny wax seal */}
-            <circle cx="28" cy="30" r="2.5" fill={theme.accent.primary} opacity="0.7" />
+            <circle cx="28" cy="30" r="2.5" fill={theme.accent.primary} opacity="0.8" />
           </svg>
           <span
             className="text-xs italic"
             style={{
               color: theme.accent.highlight,
-              opacity: 0.9,
+              opacity: 0.95,
               fontFamily: fontBody,
               letterSpacing: '0.05em',
             }}
@@ -361,7 +496,7 @@ function ScrapbookPreview() {
     { rotate: 14, x: 40, hue: theme.accent.warm, accent: theme.accent.primary, delay: 0.45 },
   ]
   return (
-    <div className="relative w-full h-full flex items-center justify-center">
+    <div className="relative w-full h-full flex items-center justify-center z-10">
       {items.map((item, i) => (
         <motion.div
           key={i}
@@ -385,7 +520,7 @@ function ScrapbookPreview() {
             className="w-16 h-20 md:w-18 md:h-24 p-1.5 md:p-2"
             style={{
               background: 'rgba(255, 250, 240, 0.97)',
-              boxShadow: `0 10px 22px rgba(0,0,0,0.32)`,
+              boxShadow: `0 12px 24px rgba(0,0,0,0.45)`,
               borderRadius: 2,
             }}
           >
@@ -395,7 +530,6 @@ function ScrapbookPreview() {
                 background: `linear-gradient(135deg, ${item.hue} 0%, ${item.accent} 100%)`,
               }}
             >
-              {/* tiny "subject" silhouette in the photo */}
               <div
                 aria-hidden
                 className="absolute bottom-0 left-1/2 -translate-x-1/2 rounded-t-full"
@@ -424,31 +558,28 @@ function ScrapbookPreview() {
 function MemoryPreview() {
   const particleCount = 14
   return (
-    <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-      {/* outer pulse ring */}
+    <div className="relative w-full h-full flex items-center justify-center overflow-hidden z-10">
       <motion.div
         className="absolute rounded-full"
         style={{
           width: 110,
           height: 110,
-          border: `1px solid ${theme.accent.warm}66`,
+          border: `1px solid ${theme.accent.warm}88`,
         }}
-        animate={{ scale: [0.7, 1.3, 0.7], opacity: [0, 0.6, 0] }}
+        animate={{ scale: [0.7, 1.3, 0.7], opacity: [0, 0.7, 0] }}
         transition={{ duration: 4, repeat: Infinity, ease: 'easeOut' }}
       />
-      {/* central glow */}
       <motion.div
         className="absolute rounded-full"
         style={{
           width: 70,
           height: 70,
-          background: `radial-gradient(circle, ${theme.accent.highlight}cc 0%, ${theme.accent.warm}88 35%, transparent 70%)`,
-          filter: 'blur(4px)',
+          background: `radial-gradient(circle, ${theme.accent.highlight}ee 0%, ${theme.accent.warm}aa 35%, transparent 70%)`,
+          filter: 'blur(3px)',
         }}
-        animate={{ scale: [1, 1.25, 1], opacity: [0.7, 1, 0.7] }}
+        animate={{ scale: [1, 1.25, 1], opacity: [0.8, 1, 0.8] }}
         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
       />
-      {/* orbiting particles */}
       {Array.from({ length: particleCount }).map((_, i) => {
         const angle = (i / particleCount) * Math.PI * 2
         const radius = 55
@@ -502,8 +633,7 @@ function EncryptionPreview() {
   }, [phases.length])
 
   return (
-    <div className="w-full h-full flex items-center justify-center px-6 relative">
-      {/* Animated padlock */}
+    <div className="w-full h-full flex items-center justify-center px-6 relative z-10">
       <motion.svg
         width="32"
         height="40"
@@ -529,14 +659,7 @@ function EncryptionPreview() {
           opacity="0.95"
         />
         <circle cx="16" cy="26" r="2" fill={theme.accent.primary} />
-        <rect
-          x="15"
-          y="27"
-          width="2"
-          height="5"
-          rx="1"
-          fill={theme.accent.primary}
-        />
+        <rect x="15" y="27" width="2" height="5" rx="1" fill={theme.accent.primary} />
       </motion.svg>
 
       <AnimatePresence mode="wait">
