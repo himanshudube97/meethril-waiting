@@ -1,16 +1,26 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
+import { useState, useEffect, FormEvent } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { theme, fontBody } from '@/lib/theme'
 
 type Status = 'idle' | 'submitting' | 'success' | 'error'
+
+const SUBSCRIBED_KEY = 'meethril_subscribed'
 
 export default function WaitlistForm({ id }: { id?: string }) {
   const [email, setEmail] = useState('')
   const [website, setWebsite] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [errorMsg, setErrorMsg] = useState('')
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(SUBSCRIBED_KEY) === '1') setStatus('success')
+    } catch {
+      // localStorage blocked — ignore, form stays interactive.
+    }
+  }, [])
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -24,6 +34,11 @@ export default function WaitlistForm({ id }: { id?: string }) {
         body: JSON.stringify({ email, website }),
       })
       if (res.ok) {
+        try {
+          localStorage.setItem(SUBSCRIBED_KEY, '1')
+        } catch {
+          // localStorage blocked — fine, just won't persist across refresh.
+        }
         setStatus('success')
         return
       }

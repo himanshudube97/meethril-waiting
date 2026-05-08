@@ -1,5 +1,5 @@
 const WINDOW_MS = 60_000
-const MAX_HITS = 5
+const MAX_HITS = 2
 
 const hits = new Map<string, number[]>()
 
