@@ -26,10 +26,10 @@ const CUE = 'leave us a way to find you when it is.'
 export default function FinalCTA() {
   return (
     <section
-      className="relative py-24 md:py-36 px-6 overflow-hidden flex items-center justify-center"
+      className="relative py-24 md:py-32 px-6 overflow-hidden flex items-center justify-center"
       style={{
-        background: `linear-gradient(180deg, #6E4248 0%, #5A3640 50%, #3A1F26 100%)`,
-        minHeight: '90vh',
+        background: `linear-gradient(180deg, #5A2530 0%, #4A1F2A 40%, #2A0F18 100%)`,
+        minHeight: '100vh',
       }}
     >
       {/* Soft warm glow at the bottom — like an ember in a quiet room */}
@@ -52,7 +52,7 @@ export default function FinalCTA() {
       />
 
       {/* Drifting embers */}
-      {Array.from({ length: 12 }).map((_, i) => (
+      {Array.from({ length: 16 }).map((_, i) => (
         <motion.div
           key={i}
           aria-hidden
@@ -61,25 +61,65 @@ export default function FinalCTA() {
             width: 2 + (i % 3),
             height: 2 + (i % 3),
             background: theme.accent.highlight,
-            left: `${10 + (i * 7.3) % 80}%`,
+            left: `${5 + (i * 6.1) % 90}%`,
             bottom: 0,
             boxShadow: `0 0 8px ${theme.accent.warm}`,
           }}
           animate={{
-            y: [0, -180 - (i % 4) * 40],
-            x: [0, i % 2 === 0 ? 12 : -12],
-            opacity: [0, 0.7, 0],
+            y: [0, -260 - (i % 4) * 50],
+            x: [0, i % 2 === 0 ? 14 : -14],
+            opacity: [0, 0.75, 0],
           }}
           transition={{
-            duration: 8 + (i % 5) * 1.5,
+            duration: 9 + (i % 5) * 1.5,
             repeat: Infinity,
-            delay: i * 0.6,
+            delay: i * 0.5,
             ease: 'easeOut',
           }}
         />
       ))}
 
-      <div className="relative z-10 text-center max-w-2xl mx-auto">
+      {/* Faint background stars to match Features */}
+      {Array.from({ length: 30 }).map((_, i) => (
+        <motion.div
+          key={`star-${i}`}
+          aria-hidden
+          className="absolute rounded-full"
+          style={{
+            width: 1 + (i % 3) * 0.4,
+            height: 1 + (i % 3) * 0.4,
+            background: theme.bg.primary,
+            left: `${(i * 13.7) % 100}%`,
+            top: `${(i * 19.1) % 100}%`,
+            boxShadow: `0 0 3px ${theme.accent.warm}88`,
+          }}
+          animate={{ opacity: [0.15, 0.6, 0.15] }}
+          transition={{
+            duration: 3 + (i % 4),
+            repeat: Infinity,
+            delay: (i * 0.31) % 5,
+            ease: 'easeInOut',
+          }}
+        />
+      ))}
+
+      <div
+        className="relative z-10 text-center max-w-2xl mx-auto rounded-3xl px-8 md:px-14 py-12 md:py-16"
+        style={{
+          background: `linear-gradient(135deg,
+            rgba(255, 200, 144, 0.10) 0%,
+            rgba(232, 148, 90, 0.13) 50%,
+            rgba(184, 94, 92, 0.10) 100%)`,
+          backdropFilter: 'blur(28px) saturate(150%)',
+          WebkitBackdropFilter: 'blur(28px) saturate(150%)',
+          border: `1px solid rgba(255, 200, 144, 0.22)`,
+          boxShadow: `
+            0 24px 60px rgba(0, 0, 0, 0.45),
+            inset 0 1px 0 rgba(255, 222, 198, 0.18),
+            inset 0 -1px 0 rgba(58, 31, 38, 0.25)
+          `,
+        }}
+      >
         {POEM.map((line, i) => (
           <motion.p
             key={i}

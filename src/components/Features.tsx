@@ -232,19 +232,24 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
         ease: [0.22, 1, 0.36, 1],
       }}
       whileHover={{ y: -4, transition: { duration: 0.25 } }}
-      className="relative overflow-hidden rounded-2xl"
+      className="relative overflow-hidden rounded-3xl"
       style={{
-        background: `linear-gradient(155deg, #FFF1DC 0%, #FFE2BC 55%, #FFD2A8 100%)`,
-        border: `1px solid rgba(255, 200, 144, 0.6)`,
+        background: `linear-gradient(135deg,
+          rgba(255, 200, 144, 0.13) 0%,
+          rgba(232, 148, 90, 0.16) 45%,
+          rgba(184, 94, 92, 0.13) 100%)`,
+        backdropFilter: 'blur(24px) saturate(150%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+        border: `1px solid rgba(255, 200, 144, 0.22)`,
         boxShadow: `
-          0 24px 60px rgba(0, 0, 0, 0.5),
-          0 8px 24px rgba(200, 71, 45, 0.25),
-          inset 0 1px 0 rgba(255, 255, 255, 0.85),
-          inset 0 -1px 0 rgba(200, 71, 45, 0.15)
+          0 18px 50px rgba(0, 0, 0, 0.45),
+          0 4px 16px rgba(200, 71, 45, 0.18),
+          inset 0 1px 0 rgba(255, 222, 198, 0.18),
+          inset 0 -1px 0 rgba(58, 31, 38, 0.2)
         `,
       }}
     >
-      {/* Inner top-light */}
+      {/* Soft top-light — like firelight catching the rim of glass */}
       <div
         aria-hidden
         className="absolute pointer-events-none"
@@ -253,9 +258,9 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
           left: '50%',
           transform: 'translateX(-50%)',
           width: '90%',
-          height: 90,
-          background: `radial-gradient(ellipse at top, ${theme.accent.highlight}88 0%, transparent 70%)`,
-          opacity: 0.6,
+          height: 100,
+          background: `radial-gradient(ellipse at top, ${theme.accent.warm}55 0%, transparent 70%)`,
+          opacity: 0.55,
         }}
       />
 
@@ -285,13 +290,12 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
           slideFromLeft ? 'md:flex-row' : 'md:flex-row-reverse'
         } md:items-stretch min-h-[260px] md:min-h-[240px]`}
       >
-        {/* Preview area */}
+        {/* Preview area — softer transition into the glass card */}
         <div
           className="relative shrink-0 w-full md:w-[44%] h-48 md:h-auto overflow-hidden flex items-center justify-center"
           style={{
-            background: `linear-gradient(180deg, #3A1F26 0%, #5A2C36 100%)`,
-            borderBottom: `1px solid rgba(58, 31, 38, 0.4)`,
-            boxShadow: `inset 0 2px 16px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 200, 144, 0.08)`,
+            background: `linear-gradient(180deg, rgba(58, 31, 38, 0.55) 0%, rgba(90, 44, 54, 0.35) 100%)`,
+            boxShadow: `inset 0 1px 12px rgba(0, 0, 0, 0.35)`,
           }}
         >
           {/* tiny stars inside the preview window */}
@@ -324,10 +328,11 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
           <h3
             className="text-2xl md:text-3xl mb-3"
             style={{
-              color: '#3A1F26',
+              color: theme.bg.primary,
               fontFamily: fontSerif,
               fontWeight: 500,
               letterSpacing: '0.01em',
+              textShadow: `0 0 24px ${feature.accentTint}66`,
             }}
           >
             {feature.title}
@@ -335,8 +340,9 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
           <p
             className="text-base md:text-lg leading-relaxed"
             style={{
-              color: '#6E4248',
+              color: theme.bg.primary,
               fontFamily: fontBody,
+              opacity: 0.82,
             }}
           >
             {feature.description}
