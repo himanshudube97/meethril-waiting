@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { theme, fontSerif, fontBody } from '@/lib/theme'
+import { useReducedAnimations } from '@/lib/use-reduced-animations'
 import WaitlistForm from './WaitlistForm'
 
 const title = 'MEETHRIL'
@@ -27,6 +28,7 @@ const whispers = [
 export default function Hero() {
   const [currentWhisper, setCurrentWhisper] = useState('')
   const [whisperKey, setWhisperKey] = useState(0)
+  const reduced = useReducedAnimations()
 
   useEffect(() => {
     const changeWhisper = () => {
@@ -43,68 +45,70 @@ export default function Hero() {
       className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6 py-12 md:py-16"
       style={{ background: theme.bg.gradient }}
     >
-      {/* Soft Glowing Orbs */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <motion.div
-          className="absolute w-[500px] h-[500px] rounded-full"
-          style={{
-            background: `radial-gradient(circle, ${theme.accent.primary}25 0%, transparent 70%)`,
-            filter: 'blur(60px)',
-            top: '-10%',
-            right: '-5%',
-          }}
-          animate={{ x: [0, 30, 0], y: [0, 20, 0], scale: [1, 1.1, 1], opacity: [0.4, 0.6, 0.4] }}
-          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className="absolute w-[400px] h-[400px] rounded-full"
-          style={{
-            background: `radial-gradient(circle, ${theme.accent.secondary}20 0%, transparent 70%)`,
-            filter: 'blur(50px)',
-            bottom: '5%',
-            left: '-5%',
-          }}
-          animate={{ x: [0, -20, 0], y: [0, -30, 0], scale: [1, 1.15, 1], opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-        />
-        <motion.div
-          className="absolute w-[300px] h-[300px] rounded-full"
-          style={{
-            background: `radial-gradient(circle, ${theme.accent.warm}15 0%, transparent 70%)`,
-            filter: 'blur(40px)',
-            top: '40%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-          }}
-          animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
-          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-        />
-
-        {[...Array(20)].map((_, i) => (
+      {/* Soft Glowing Orbs — desktop only; on mobile they tank framerate */}
+      {!reduced && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <motion.div
-            key={i}
-            className="absolute rounded-full"
+            className="absolute w-[500px] h-[500px] rounded-full"
             style={{
-              width: 2 + (i % 3),
-              height: 2 + (i % 3),
-              background: theme.text.muted,
-              left: `${5 + (i * 4.7) % 90}%`,
-              top: `${10 + (i * 7.3) % 80}%`,
+              background: `radial-gradient(circle, ${theme.accent.primary}25 0%, transparent 70%)`,
+              filter: 'blur(60px)',
+              top: '-10%',
+              right: '-5%',
             }}
-            animate={{
-              y: [-20, -60 - (i % 3) * 20],
-              x: [i % 2 === 0 ? -10 : 10, i % 2 === 0 ? 10 : -10],
-              opacity: [0, 0.4, 0],
-            }}
-            transition={{
-              duration: 8 + (i % 5) * 2,
-              repeat: Infinity,
-              delay: i * 0.7,
-              ease: 'easeInOut',
-            }}
+            animate={{ x: [0, 30, 0], y: [0, 20, 0], scale: [1, 1.1, 1], opacity: [0.4, 0.6, 0.4] }}
+            transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
           />
-        ))}
-      </div>
+          <motion.div
+            className="absolute w-[400px] h-[400px] rounded-full"
+            style={{
+              background: `radial-gradient(circle, ${theme.accent.secondary}20 0%, transparent 70%)`,
+              filter: 'blur(50px)',
+              bottom: '5%',
+              left: '-5%',
+            }}
+            animate={{ x: [0, -20, 0], y: [0, -30, 0], scale: [1, 1.15, 1], opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+          />
+          <motion.div
+            className="absolute w-[300px] h-[300px] rounded-full"
+            style={{
+              background: `radial-gradient(circle, ${theme.accent.warm}15 0%, transparent 70%)`,
+              filter: 'blur(40px)',
+              top: '40%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+            animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
+            transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+          />
+
+          {[...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute rounded-full"
+              style={{
+                width: 2 + (i % 3),
+                height: 2 + (i % 3),
+                background: theme.text.muted,
+                left: `${5 + (i * 4.7) % 90}%`,
+                top: `${10 + (i * 7.3) % 80}%`,
+              }}
+              animate={{
+                y: [-20, -60 - (i % 3) * 20],
+                x: [i % 2 === 0 ? -10 : 10, i % 2 === 0 ? 10 : -10],
+                opacity: [0, 0.4, 0],
+              }}
+              transition={{
+                duration: 8 + (i % 5) * 2,
+                repeat: Infinity,
+                delay: i * 0.7,
+                ease: 'easeInOut',
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="relative z-10 text-center w-full">

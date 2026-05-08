@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { theme, fontSerif, fontBody } from '@/lib/theme'
+import { useReducedAnimations } from '@/lib/use-reduced-animations'
 import WaitlistForm from './WaitlistForm'
 
 /*
@@ -24,6 +25,11 @@ const POEM = ['Some things take root slowly.', 'Yours will be ready in a few wee
 const CUE = 'leave us a way to find you when it is.'
 
 export default function FinalCTA() {
+  const reduced = useReducedAnimations()
+
+  // Static-star count on mobile, animated on desktop
+  const starCount = reduced ? 12 : 30
+
   return (
     <section
       className="relative py-24 md:py-32 px-6 overflow-hidden flex items-center justify-center"
@@ -32,88 +38,118 @@ export default function FinalCTA() {
         minHeight: '100vh',
       }}
     >
-      {/* Soft warm glow at the bottom — like an ember in a quiet room */}
-      <motion.div
-        aria-hidden
-        className="absolute pointer-events-none rounded-full"
-        style={{
-          width: '70vw',
-          height: '70vw',
-          maxWidth: 900,
-          maxHeight: 900,
-          background: `radial-gradient(circle, ${theme.accent.warm}30 0%, transparent 65%)`,
-          filter: 'blur(80px)',
-          bottom: '-30%',
-          left: '50%',
-          transform: 'translateX(-50%)',
-        }}
-        animate={{ opacity: [0.55, 0.85, 0.55], scale: [1, 1.05, 1] }}
-        transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
-      />
-
-      {/* Drifting embers */}
-      {Array.from({ length: 16 }).map((_, i) => (
+      {/* Soft warm glow at the bottom — desktop only (huge blur radius) */}
+      {!reduced && (
         <motion.div
-          key={i}
           aria-hidden
-          className="absolute rounded-full"
+          className="absolute pointer-events-none rounded-full"
           style={{
-            width: 2 + (i % 3),
-            height: 2 + (i % 3),
-            background: theme.accent.highlight,
-            left: `${5 + (i * 6.1) % 90}%`,
-            bottom: 0,
-            boxShadow: `0 0 8px ${theme.accent.warm}`,
+            width: '70vw',
+            height: '70vw',
+            maxWidth: 900,
+            maxHeight: 900,
+            background: `radial-gradient(circle, ${theme.accent.warm}30 0%, transparent 65%)`,
+            filter: 'blur(80px)',
+            bottom: '-30%',
+            left: '50%',
+            transform: 'translateX(-50%)',
           }}
-          animate={{
-            y: [0, -260 - (i % 4) * 50],
-            x: [0, i % 2 === 0 ? 14 : -14],
-            opacity: [0, 0.75, 0],
-          }}
-          transition={{
-            duration: 9 + (i % 5) * 1.5,
-            repeat: Infinity,
-            delay: i * 0.5,
-            ease: 'easeOut',
-          }}
+          animate={{ opacity: [0.55, 0.85, 0.55], scale: [1, 1.05, 1] }}
+          transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
         />
-      ))}
+      )}
 
-      {/* Faint background stars to match Features */}
-      {Array.from({ length: 30 }).map((_, i) => (
-        <motion.div
-          key={`star-${i}`}
-          aria-hidden
-          className="absolute rounded-full"
-          style={{
-            width: 1 + (i % 3) * 0.4,
-            height: 1 + (i % 3) * 0.4,
-            background: theme.bg.primary,
-            left: `${(i * 13.7) % 100}%`,
-            top: `${(i * 19.1) % 100}%`,
-            boxShadow: `0 0 3px ${theme.accent.warm}88`,
-          }}
-          animate={{ opacity: [0.15, 0.6, 0.15] }}
-          transition={{
-            duration: 3 + (i % 4),
-            repeat: Infinity,
-            delay: (i * 0.31) % 5,
-            ease: 'easeInOut',
-          }}
-        />
-      ))}
+      {/* Drifting embers — desktop only */}
+      {!reduced &&
+        Array.from({ length: 16 }).map((_, i) => (
+          <motion.div
+            key={i}
+            aria-hidden
+            className="absolute rounded-full"
+            style={{
+              width: 2 + (i % 3),
+              height: 2 + (i % 3),
+              background: theme.accent.highlight,
+              left: `${5 + (i * 6.1) % 90}%`,
+              bottom: 0,
+              boxShadow: `0 0 8px ${theme.accent.warm}`,
+            }}
+            animate={{
+              y: [0, -260 - (i % 4) * 50],
+              x: [0, i % 2 === 0 ? 14 : -14],
+              opacity: [0, 0.75, 0],
+            }}
+            transition={{
+              duration: 9 + (i % 5) * 1.5,
+              repeat: Infinity,
+              delay: i * 0.5,
+              ease: 'easeOut',
+            }}
+          />
+        ))}
+
+      {/* Faint background stars — fewer + static on mobile */}
+      {Array.from({ length: starCount }).map((_, i) =>
+        reduced ? (
+          <div
+            key={`star-${i}`}
+            aria-hidden
+            className="absolute rounded-full"
+            style={{
+              width: 1 + (i % 3) * 0.4,
+              height: 1 + (i % 3) * 0.4,
+              background: theme.bg.primary,
+              left: `${(i * 13.7) % 100}%`,
+              top: `${(i * 19.1) % 100}%`,
+              opacity: 0.4,
+            }}
+          />
+        ) : (
+          <motion.div
+            key={`star-${i}`}
+            aria-hidden
+            className="absolute rounded-full"
+            style={{
+              width: 1 + (i % 3) * 0.4,
+              height: 1 + (i % 3) * 0.4,
+              background: theme.bg.primary,
+              left: `${(i * 13.7) % 100}%`,
+              top: `${(i * 19.1) % 100}%`,
+              boxShadow: `0 0 3px ${theme.accent.warm}88`,
+            }}
+            animate={{ opacity: [0.15, 0.6, 0.15] }}
+            transition={{
+              duration: 3 + (i % 4),
+              repeat: Infinity,
+              delay: (i * 0.31) % 5,
+              ease: 'easeInOut',
+            }}
+          />
+        )
+      )}
 
       <div
         className="relative z-10 text-center max-w-2xl mx-auto rounded-3xl px-8 md:px-14 py-12 md:py-16"
         style={{
-          background: `linear-gradient(135deg,
-            rgba(255, 200, 144, 0.10) 0%,
-            rgba(232, 148, 90, 0.13) 50%,
-            rgba(184, 94, 92, 0.10) 100%)`,
-          backdropFilter: 'blur(28px) saturate(150%)',
-          WebkitBackdropFilter: 'blur(28px) saturate(150%)',
+          background: reduced
+            ? `linear-gradient(135deg,
+              rgba(255, 200, 144, 0.16) 0%,
+              rgba(232, 148, 90, 0.20) 50%,
+              rgba(184, 94, 92, 0.16) 100%)`
+            : `linear-gradient(135deg,
+              rgba(255, 200, 144, 0.10) 0%,
+              rgba(232, 148, 90, 0.13) 50%,
+              rgba(184, 94, 92, 0.10) 100%)`,
+          ...(reduced
+            ? {}
+            : {
+                backdropFilter: 'blur(28px) saturate(150%)',
+                WebkitBackdropFilter: 'blur(28px) saturate(150%)',
+              }),
           border: `1px solid rgba(255, 200, 144, 0.22)`,
-          boxShadow: `
+          boxShadow: reduced
+            ? `0 12px 32px rgba(0, 0, 0, 0.4)`
+            : `
             0 24px 60px rgba(0, 0, 0, 0.45),
             inset 0 1px 0 rgba(255, 222, 198, 0.18),
             inset 0 -1px 0 rgba(58, 31, 38, 0.25)

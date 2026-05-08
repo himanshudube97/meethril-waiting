@@ -3,6 +3,7 @@
 import { useEffect, useState, ReactNode, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { theme, fontSerif, fontBody } from '@/lib/theme'
+import { useReducedAnimations } from '@/lib/use-reduced-animations'
 
 type Feature = {
   title: string
@@ -50,6 +51,8 @@ const features: Feature[] = [
 ]
 
 export default function Features() {
+  const reduced = useReducedAnimations()
+
   return (
     <section
       className="relative py-24 md:py-32 px-6 overflow-hidden"
@@ -57,42 +60,46 @@ export default function Features() {
         background: `linear-gradient(180deg, #2A0F18 0%, #4A1A24 25%, #7A2C36 60%, #5A2530 100%)`,
       }}
     >
-      <Starfield />
-      <ShootingStars />
+      <Starfield reduced={reduced} />
+      {!reduced && <ShootingStars />}
 
-      {/* Big atmospheric glows */}
-      <motion.div
-        aria-hidden
-        className="absolute pointer-events-none rounded-full"
-        style={{
-          width: '60vw',
-          height: '60vw',
-          maxWidth: 800,
-          maxHeight: 800,
-          background: `radial-gradient(circle, ${theme.accent.warm}28 0%, transparent 65%)`,
-          filter: 'blur(80px)',
-          top: '15%',
-          left: '-20%',
-        }}
-        animate={{ opacity: [0.4, 0.85, 0.4], scale: [1, 1.08, 1] }}
-        transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-      />
-      <motion.div
-        aria-hidden
-        className="absolute pointer-events-none rounded-full"
-        style={{
-          width: '55vw',
-          height: '55vw',
-          maxWidth: 700,
-          maxHeight: 700,
-          background: `radial-gradient(circle, ${theme.accent.highlight}22 0%, transparent 65%)`,
-          filter: 'blur(90px)',
-          bottom: '5%',
-          right: '-15%',
-        }}
-        animate={{ opacity: [0.3, 0.7, 0.3], scale: [1, 1.1, 1] }}
-        transition={{ duration: 13, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
-      />
+      {/* Big atmospheric glows — desktop only (huge blur radii kill mobile GPUs) */}
+      {!reduced && (
+        <>
+          <motion.div
+            aria-hidden
+            className="absolute pointer-events-none rounded-full"
+            style={{
+              width: '60vw',
+              height: '60vw',
+              maxWidth: 800,
+              maxHeight: 800,
+              background: `radial-gradient(circle, ${theme.accent.warm}28 0%, transparent 65%)`,
+              filter: 'blur(80px)',
+              top: '15%',
+              left: '-20%',
+            }}
+            animate={{ opacity: [0.4, 0.85, 0.4], scale: [1, 1.08, 1] }}
+            transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div
+            aria-hidden
+            className="absolute pointer-events-none rounded-full"
+            style={{
+              width: '55vw',
+              height: '55vw',
+              maxWidth: 700,
+              maxHeight: 700,
+              background: `radial-gradient(circle, ${theme.accent.highlight}22 0%, transparent 65%)`,
+              filter: 'blur(90px)',
+              bottom: '5%',
+              right: '-15%',
+            }}
+            animate={{ opacity: [0.3, 0.7, 0.3], scale: [1, 1.1, 1] }}
+            transition={{ duration: 13, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
+          />
+        </>
+      )}
 
       <div className="relative z-10 max-w-5xl mx-auto">
         <motion.h2
@@ -125,7 +132,7 @@ export default function Features() {
 
         <div className="flex flex-col gap-8 md:gap-12">
           {features.map((feature, i) => (
-            <FeatureCard key={feature.title} feature={feature} index={i} />
+            <FeatureCard key={feature.title} feature={feature} index={i} reduced={reduced} />
           ))}
         </div>
       </div>
@@ -133,10 +140,11 @@ export default function Features() {
   )
 }
 
-function Starfield() {
-  // Generate stars once on mount; deterministic per render via index-based math
+function Starfield({ reduced }: { reduced: boolean }) {
+  // On mobile/reduced-motion: render fewer, static stars (no rAF loop).
+  const count = reduced ? 28 : 80
   const stars = useMemo(() => {
-    return Array.from({ length: 80 }).map((_, i) => ({
+    return Array.from({ length: count }).map((_, i) => ({
       id: i,
       left: (i * 13.7) % 100,
       top: (i * 19.3) % 100,
@@ -145,36 +153,52 @@ function Starfield() {
       delay: (i * 0.27) % 6,
       bright: i % 7 === 0,
     }))
-  }, [])
+  }, [count])
 
   return (
     <div aria-hidden className="absolute inset-0 pointer-events-none">
-      {stars.map((s) => (
-        <motion.div
-          key={s.id}
-          className="absolute rounded-full"
-          style={{
-            left: `${s.left}%`,
-            top: `${s.top}%`,
-            width: s.size,
-            height: s.size,
-            background: s.bright ? theme.accent.highlight : theme.bg.primary,
-            boxShadow: s.bright
-              ? `0 0 ${4 + s.size * 2}px ${theme.accent.warm}, 0 0 ${8 + s.size * 3}px ${theme.accent.warm}55`
-              : `0 0 3px ${theme.bg.primary}`,
-          }}
-          animate={{
-            opacity: [0.15, s.bright ? 1 : 0.7, 0.15],
-            scale: s.bright ? [0.9, 1.4, 0.9] : [1, 1.15, 1],
-          }}
-          transition={{
-            duration: s.duration,
-            repeat: Infinity,
-            delay: s.delay,
-            ease: 'easeInOut',
-          }}
-        />
-      ))}
+      {stars.map((s) =>
+        reduced ? (
+          <div
+            key={s.id}
+            className="absolute rounded-full"
+            style={{
+              left: `${s.left}%`,
+              top: `${s.top}%`,
+              width: s.size,
+              height: s.size,
+              background: s.bright ? theme.accent.highlight : theme.bg.primary,
+              opacity: s.bright ? 0.85 : 0.5,
+              boxShadow: s.bright ? `0 0 4px ${theme.accent.warm}` : undefined,
+            }}
+          />
+        ) : (
+          <motion.div
+            key={s.id}
+            className="absolute rounded-full"
+            style={{
+              left: `${s.left}%`,
+              top: `${s.top}%`,
+              width: s.size,
+              height: s.size,
+              background: s.bright ? theme.accent.highlight : theme.bg.primary,
+              boxShadow: s.bright
+                ? `0 0 ${4 + s.size * 2}px ${theme.accent.warm}, 0 0 ${8 + s.size * 3}px ${theme.accent.warm}55`
+                : `0 0 3px ${theme.bg.primary}`,
+            }}
+            animate={{
+              opacity: [0.15, s.bright ? 1 : 0.7, 0.15],
+              scale: s.bright ? [0.9, 1.4, 0.9] : [1, 1.15, 1],
+            }}
+            transition={{
+              duration: s.duration,
+              repeat: Infinity,
+              delay: s.delay,
+              ease: 'easeInOut',
+            }}
+          />
+        )
+      )}
     </div>
   )
 }
@@ -217,31 +241,52 @@ function ShootingStars() {
   )
 }
 
-function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
+function FeatureCard({
+  feature,
+  index,
+  reduced,
+}: {
+  feature: Feature
+  index: number
+  reduced: boolean
+}) {
   // Even-indexed cards slide in from the left, odd from the right.
   const slideFromLeft = index % 2 === 0
-  const slideX = slideFromLeft ? -120 : 120
+  // Skip the big horizontal slide on mobile — just fade up. Cheaper, no overflow churn.
+  const slideX = reduced ? 0 : slideFromLeft ? -120 : 120
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: slideX }}
-      whileInView={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, x: slideX, y: reduced ? 16 : 0 }}
+      whileInView={{ opacity: 1, x: 0, y: 0 }}
       viewport={{ once: true, margin: '-80px' }}
       transition={{
-        duration: 0.95,
+        duration: reduced ? 0.6 : 0.95,
         ease: [0.22, 1, 0.36, 1],
       }}
-      whileHover={{ y: -4, transition: { duration: 0.25 } }}
+      whileHover={reduced ? undefined : { y: -4, transition: { duration: 0.25 } }}
       className="relative overflow-hidden rounded-3xl"
       style={{
-        background: `linear-gradient(135deg,
-          rgba(255, 200, 144, 0.13) 0%,
-          rgba(232, 148, 90, 0.16) 45%,
-          rgba(184, 94, 92, 0.13) 100%)`,
-        backdropFilter: 'blur(24px) saturate(150%)',
-        WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+        background: reduced
+          ? `linear-gradient(135deg,
+            rgba(255, 200, 144, 0.18) 0%,
+            rgba(232, 148, 90, 0.22) 45%,
+            rgba(184, 94, 92, 0.18) 100%)`
+          : `linear-gradient(135deg,
+            rgba(255, 200, 144, 0.13) 0%,
+            rgba(232, 148, 90, 0.16) 45%,
+            rgba(184, 94, 92, 0.13) 100%)`,
+        // backdropFilter is one of the most expensive properties on mobile — drop it there
+        ...(reduced
+          ? {}
+          : {
+              backdropFilter: 'blur(24px) saturate(150%)',
+              WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+            }),
         border: `1px solid rgba(255, 200, 144, 0.22)`,
-        boxShadow: `
+        boxShadow: reduced
+          ? `0 8px 24px rgba(0, 0, 0, 0.4)`
+          : `
           0 18px 50px rgba(0, 0, 0, 0.45),
           0 4px 16px rgba(200, 71, 45, 0.18),
           inset 0 1px 0 rgba(255, 222, 198, 0.18),
@@ -264,26 +309,28 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
         }}
       />
 
-      {/* Accent glow on the side the card slides in from */}
-      <motion.div
-        aria-hidden
-        className="absolute pointer-events-none rounded-full"
-        style={{
-          width: 260,
-          height: 260,
-          background: `radial-gradient(circle, ${feature.accentTint}66 0%, transparent 65%)`,
-          filter: 'blur(50px)',
-          top: -80,
-          ...(slideFromLeft ? { right: -90 } : { left: -90 }),
-        }}
-        animate={{ opacity: [0.55, 0.85, 0.55], scale: [1, 1.06, 1] }}
-        transition={{
-          duration: 6 + index * 0.5,
-          repeat: Infinity,
-          ease: 'easeInOut',
-          delay: index * 0.4,
-        }}
-      />
+      {/* Accent glow on the side the card slides in from — desktop only */}
+      {!reduced && (
+        <motion.div
+          aria-hidden
+          className="absolute pointer-events-none rounded-full"
+          style={{
+            width: 260,
+            height: 260,
+            background: `radial-gradient(circle, ${feature.accentTint}66 0%, transparent 65%)`,
+            filter: 'blur(50px)',
+            top: -80,
+            ...(slideFromLeft ? { right: -90 } : { left: -90 }),
+          }}
+          animate={{ opacity: [0.55, 0.85, 0.55], scale: [1, 1.06, 1] }}
+          transition={{
+            duration: 6 + index * 0.5,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: index * 0.4,
+          }}
+        />
+      )}
 
       <div
         className={`relative z-10 flex flex-col ${
@@ -298,28 +345,29 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
             boxShadow: `inset 0 1px 12px rgba(0, 0, 0, 0.35)`,
           }}
         >
-          {/* tiny stars inside the preview window */}
-          {[...Array(6)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute rounded-full pointer-events-none"
-              style={{
-                width: 1.5,
-                height: 1.5,
-                background: theme.accent.highlight,
-                left: `${10 + i * 16}%`,
-                top: `${15 + (i * 17) % 70}%`,
-                boxShadow: `0 0 4px ${theme.accent.warm}`,
-              }}
-              animate={{ opacity: [0.2, 0.9, 0.2] }}
-              transition={{
-                duration: 2.5 + i * 0.4,
-                repeat: Infinity,
-                delay: i * 0.4,
-                ease: 'easeInOut',
-              }}
-            />
-          ))}
+          {/* tiny stars inside the preview window — desktop only */}
+          {!reduced &&
+            [...Array(6)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute rounded-full pointer-events-none"
+                style={{
+                  width: 1.5,
+                  height: 1.5,
+                  background: theme.accent.highlight,
+                  left: `${10 + i * 16}%`,
+                  top: `${15 + (i * 17) % 70}%`,
+                  boxShadow: `0 0 4px ${theme.accent.warm}`,
+                }}
+                animate={{ opacity: [0.2, 0.9, 0.2] }}
+                transition={{
+                  duration: 2.5 + i * 0.4,
+                  repeat: Infinity,
+                  delay: i * 0.4,
+                  ease: 'easeInOut',
+                }}
+              />
+            ))}
           {feature.preview}
         </div>
 
