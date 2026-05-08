@@ -22,14 +22,12 @@
 }
 
 html, body {
-  height: 100%;
   margin: 0;
   padding: 0;
 }
 
 body {
-  background: linear-gradient(180deg, var(--bg-from) 0%, var(--bg-mid-1) 35%, var(--bg-mid-2) 65%, var(--bg-to) 100%);
   color: var(--text-primary);
   font-family: var(--font-body);
-  overflow: hidden;
+  background: var(--bg-from);
 }
