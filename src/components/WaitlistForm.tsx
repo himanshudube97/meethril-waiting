@@ -87,15 +87,16 @@ export default function WaitlistForm({ id }: { id?: string }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={status === 'submitting'}
-              className="flex-1 h-12 sm:h-13 px-5 rounded-full border outline-none transition-all"
+              className="w-full sm:flex-1 h-12 sm:h-[52px] px-5 rounded-full border outline-none transition-all"
               style={{
-                backgroundColor: 'rgba(255, 222, 198, 0.6)',
+                backgroundColor: 'rgba(255, 245, 225, 0.78)',
                 borderColor:
-                  status === 'error' ? theme.accent.primary : 'rgba(200, 71, 45, 0.2)',
+                  status === 'error' ? theme.accent.primary : 'rgba(200, 71, 45, 0.4)',
                 color: theme.text.primary,
                 fontFamily: fontBody,
                 fontSize: '16px',
-                backdropFilter: 'blur(8px)',
+                backdropFilter: 'blur(10px)',
+                boxShadow: `inset 0 1px 2px rgba(58, 31, 38, 0.08)`,
               }}
             />
 
@@ -104,11 +105,11 @@ export default function WaitlistForm({ id }: { id?: string }) {
               disabled={status === 'submitting'}
               whileHover={{ scale: status === 'submitting' ? 1 : 1.04 }}
               whileTap={{ scale: status === 'submitting' ? 1 : 0.96 }}
-              className="relative h-12 sm:h-13 px-8 rounded-full text-base font-medium overflow-hidden disabled:opacity-60 whitespace-nowrap"
+              className="relative w-full sm:w-auto h-12 sm:h-[52px] px-6 sm:px-8 rounded-full text-base font-medium overflow-hidden disabled:opacity-60 whitespace-nowrap"
               style={{
                 background: theme.accent.primary,
                 color: theme.bg.primary,
-                boxShadow: `0 0 32px ${theme.accent.primary}30`,
+                boxShadow: `0 6px 18px ${theme.accent.primary}55`,
                 fontFamily: fontBody,
               }}
             >

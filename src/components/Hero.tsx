@@ -40,7 +40,7 @@ export default function Hero() {
 
   return (
     <section
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6 py-16"
+      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6 py-12 md:py-16"
       style={{ background: theme.bg.gradient }}
     >
       {/* Soft Glowing Orbs */}
@@ -136,14 +136,14 @@ export default function Hero() {
           <TypewriterText text={tagline} delay={1} accent={theme.accent.primary} />
         </motion.p>
 
-        <div className="h-16 mb-10 flex items-center justify-center px-4">
+        <div className="h-16 mb-8 md:mb-10 flex items-center justify-center px-4">
           <AnimatePresence mode="wait">
             <motion.p
               key={whisperKey}
               className="text-sm md:text-base italic max-w-md"
-              style={{ color: theme.text.muted, fontFamily: fontBody }}
+              style={{ color: theme.text.secondary, fontFamily: fontBody }}
               initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 0.8, y: 0 }}
+              animate={{ opacity: 0.95, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 1 }}
             >
