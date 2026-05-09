@@ -174,7 +174,7 @@ export default function Hero() {
             coming soon · may 2026
           </p>
 
-          <WaitlistForm id="hero" />
+          <WaitlistForm id="hero" showInviteNote />
         </motion.div>
       </div>
 

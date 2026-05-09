@@ -10,13 +10,20 @@ type Status = 'idle' | 'submitting' | 'success' | 'error'
 const SUBSCRIBED_KEY = 'meethril_subscribed'
 const SUBSCRIBED_EMAIL_KEY = 'meethril_subscribed_email'
 
-export default function WaitlistForm({ id }: { id?: string }) {
+export default function WaitlistForm({
+  id,
+  showInviteNote = false,
+}: {
+  id?: string
+  showInviteNote?: boolean
+}) {
   const [email, setEmail] = useState('')
   const [website, setWebsite] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const [shareCode, setShareCode] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [arrivedViaRef, setArrivedViaRef] = useState(false)
 
   useEffect(() => {
     try {
@@ -27,6 +34,14 @@ export default function WaitlistForm({ id }: { id?: string }) {
       }
     } catch {
       // localStorage blocked — ignore, form stays interactive.
+    }
+    // Detect arrival via a share link so we can show a soft "a friend sent you here" note.
+    try {
+      if (new URLSearchParams(window.location.search).get('ref')) {
+        setArrivedViaRef(true)
+      }
+    } catch {
+      // ignore
     }
   }, [])
 
@@ -110,6 +125,18 @@ export default function WaitlistForm({ id }: { id?: string }) {
 
   return (
     <div className="w-full max-w-xl mx-auto">
+      {showInviteNote && arrivedViaRef && status !== 'success' && (
+        <motion.p
+          initial={{ opacity: 0, y: -6 }}
+          animate={{ opacity: 0.85, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="text-sm md:text-base italic text-center mb-5"
+          style={{ color: theme.text.secondary, fontFamily: fontBody }}
+        >
+          a friend sent you here ♥
+        </motion.p>
+      )}
+
       <AnimatePresence mode="wait">
         {status === 'success' ? (
           <motion.div
