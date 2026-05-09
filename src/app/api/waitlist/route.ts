@@ -23,7 +23,7 @@ function getSiteOrigin(req: NextRequest): string {
 }
 
 export async function POST(req: NextRequest) {
-  let body: { email?: unknown; website?: unknown }
+  let body: { email?: unknown; website?: unknown; ref?: unknown }
   try {
     body = await req.json()
   } catch {
@@ -39,6 +39,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'invalid_email' }, { status: 400 })
   }
 
+  // Referral code from `?ref=` on the share link. Sanitize to A-Z0-9, max 8 chars
+  // — that's the shape shareCodeFor produces. Anything else is dropped.
+  const ref =
+    typeof body.ref === 'string' && /^[A-Z0-9]{1,8}$/i.test(body.ref)
+      ? body.ref.toUpperCase()
+      : null
+
   const ip = getClientIp(req)
   if (!rateLimitOk(ip)) {
     return NextResponse.json({ error: 'rate_limited' }, { status: 429 })
@@ -52,6 +59,13 @@ export async function POST(req: NextRequest) {
 
   const email = body.email
   const resend = getResend()
+
+  // Log the referral signal so it shows up in Vercel logs / wherever logs go.
+  // No DB to persist into — when you want real attribution, swap this for a
+  // KV write or store ref as a Resend custom contact field.
+  if (ref) {
+    console.log(`[waitlist] signup ref=${ref} email=${email}`)
+  }
 
   let alreadyOnList = false
   try {
